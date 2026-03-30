@@ -1,12 +1,8 @@
 // lib/db.ts
 import { openDB, type IDBPDatabase } from 'idb'
-import type { OracleProfile, OracleSession } from './types'
+import type { OracleSession } from './types'
 
 interface OracleDB {
-  profile: {
-    key: string
-    value: OracleProfile
-  }
   sessions: {
     key: string
     value: OracleSession
@@ -24,15 +20,13 @@ export async function getDB(userId: string): Promise<IDBPDatabase<OracleDB>> {
     dbInstance = null
   }
   dbUserId = userId
-  dbInstance = await openDB<OracleDB>(`oracle-${userId}`, 1, {
+  dbInstance = await openDB<OracleDB>(`oracle-${userId}`, 2, {
     upgrade(db) {
-      if (!db.objectStoreNames.contains('profile')) {
-        db.createObjectStore('profile', { keyPath: 'userId' })
-      }
       if (!db.objectStoreNames.contains('sessions')) {
         const store = db.createObjectStore('sessions', { keyPath: 'id' })
         store.createIndex('by_started', 'startedAt')
       }
+      // profile store removed — profile now lives in localStorage
     },
   })
   return dbInstance
