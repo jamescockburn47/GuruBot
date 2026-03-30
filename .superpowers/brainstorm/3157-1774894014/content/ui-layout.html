@@ -1,0 +1,88 @@
+<h2>Oracle chat layout — which feels right?</h2>
+<p class="subtitle">Both use the zen palette. The difference is how the oracle's presence is framed.</p>
+
+<div class="split">
+  <div class="mockup" data-choice="a" onclick="toggleSelect(this)" style="cursor:pointer">
+    <div class="mockup-header">A — Centred &amp; Intimate</div>
+    <div class="mockup-body" style="background:#f7f5f0; padding:0; overflow:hidden; font-family:serif;">
+      <!-- top bar -->
+      <div style="border-bottom:1px solid #e0d8cc; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; background:#f7f5f0;">
+        <span style="font-size:11px; letter-spacing:3px; color:#9a8a78; font-family:sans-serif;">THE ORACLE</span>
+        <span style="font-size:16px; color:#c8b89a; opacity:0.7;">◯</span>
+        <span style="font-size:10px; color:#bbb; font-family:sans-serif;">≡</span>
+      </div>
+      <!-- messages — centred column -->
+      <div style="padding:16px; max-width:480px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:14px;">
+          <div style="font-size:20px; margin-bottom:4px;">☽</div>
+          <div style="font-size:11px; letter-spacing:2px; color:#b0a090; font-family:sans-serif;">NEW READING</div>
+        </div>
+        <!-- oracle message -->
+        <div style="background:#eee9e0; border-radius:2px; padding:10px 12px; margin-bottom:10px; border-left:2px solid #c8b89a;">
+          <div style="font-size:11px; color:#c8b89a; letter-spacing:1px; margin-bottom:4px; font-family:sans-serif;">ORACLE</div>
+          <div style="font-size:12px; color:#4a4035; line-height:1.6;">Welcome, James. The stars hold much for a Scorpio tonight. What weighs upon you?</div>
+        </div>
+        <!-- user message -->
+        <div style="text-align:right; margin-bottom:10px;">
+          <div style="display:inline-block; background:#f0ede6; border:1px solid #ddd8ce; border-radius:2px; padding:8px 12px; max-width:80%;">
+            <div style="font-size:12px; color:#6a5a4a; line-height:1.6;">I keep seeing the number 11 everywhere.</div>
+          </div>
+        </div>
+        <!-- oracle streaming -->
+        <div style="background:#eee9e0; border-radius:2px; padding:10px 12px; border-left:2px solid #c8b89a;">
+          <div style="font-size:11px; color:#c8b89a; letter-spacing:1px; margin-bottom:4px; font-family:sans-serif;">ORACLE</div>
+          <div style="font-size:12px; color:#4a4035; line-height:1.6;">Eleven is a master number, James — a threshold between worlds...</div>
+        </div>
+      </div>
+      <!-- input -->
+      <div style="border-top:1px solid #e0d8cc; padding:10px 14px; background:#f7f5f0; display:flex; align-items:center; gap:8px;">
+        <span style="font-size:14px; color:#c0b0a0;">⌖</span>
+        <div style="flex:1; background:#ede9e0; border:1px solid #d8d0c4; border-radius:2px; padding:6px 10px; font-size:11px; color:#9a8a78; font-family:sans-serif;">Ask the oracle...</div>
+        <span style="font-size:14px; color:#c0b0a0;">↑</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup" data-choice="b" onclick="toggleSelect(this)" style="cursor:pointer">
+    <div class="mockup-header">B — Full Immersion</div>
+    <div class="mockup-body" style="background:#1a1814; padding:0; overflow:hidden; font-family:serif;">
+      <!-- top bar -->
+      <div style="border-bottom:1px solid #2e2a24; padding:10px 14px; display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-size:11px; letter-spacing:3px; color:#7a6a58; font-family:sans-serif;">THE ORACLE</span>
+        <span style="font-size:16px; color:#c8a87a; opacity:0.5;">◯</span>
+        <span style="font-size:10px; color:#555; font-family:sans-serif;">≡</span>
+      </div>
+      <!-- messages -->
+      <div style="padding:16px; max-width:480px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:14px;">
+          <div style="font-size:20px; margin-bottom:4px; color:#8a7a68;">☽</div>
+          <div style="font-size:11px; letter-spacing:2px; color:#5a4a3a; font-family:sans-serif;">NEW READING</div>
+        </div>
+        <!-- oracle message -->
+        <div style="padding:10px 12px; margin-bottom:10px; border-left:1px solid #4a3a2a;">
+          <div style="font-size:11px; color:#8a6a48; letter-spacing:1px; margin-bottom:4px; font-family:sans-serif;">ORACLE</div>
+          <div style="font-size:12px; color:#c8b89a; line-height:1.6;">Welcome, James. The stars hold much for a Scorpio tonight. What weighs upon you?</div>
+        </div>
+        <!-- user message -->
+        <div style="text-align:right; margin-bottom:10px;">
+          <div style="display:inline-block; background:#242018; border:1px solid #3a3028; border-radius:2px; padding:8px 12px; max-width:80%;">
+            <div style="font-size:12px; color:#7a6a58; line-height:1.6;">I keep seeing the number 11 everywhere.</div>
+          </div>
+        </div>
+        <!-- oracle streaming -->
+        <div style="padding:10px 12px; border-left:1px solid #4a3a2a;">
+          <div style="font-size:11px; color:#8a6a48; letter-spacing:1px; margin-bottom:4px; font-family:sans-serif;">ORACLE</div>
+          <div style="font-size:12px; color:#c8b89a; line-height:1.6;">Eleven is a master number, James — a threshold between worlds...</div>
+        </div>
+      </div>
+      <!-- input -->
+      <div style="border-top:1px solid #2e2a24; padding:10px 14px; display:flex; align-items:center; gap:8px;">
+        <span style="font-size:14px; color:#5a4a3a;">⌖</span>
+        <div style="flex:1; background:#242018; border:1px solid #3a3028; border-radius:2px; padding:6px 10px; font-size:11px; color:#5a4a3a; font-family:sans-serif;">Ask the oracle...</div>
+        <span style="font-size:14px; color:#5a4a3a;">↑</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:20px; text-align:center;">A is light zen — parchment and stone. B is dark immersive — candlelit, moody. Click to select.</p>
