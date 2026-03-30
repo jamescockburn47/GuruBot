@@ -7,14 +7,22 @@ function storageKey(userId: string) {
   return `oracle-profile-${userId}`
 }
 
+function lsGet(key: string): string | null {
+  try { return localStorage.getItem(key) } catch { return null }
+}
+
+function lsSet(key: string, value: string): void {
+  try { localStorage.setItem(key, value) } catch { /* storage blocked */ }
+}
+
 export function hasProfile(userId: string): Promise<boolean> {
   if (typeof window === 'undefined') return Promise.resolve(false)
-  return Promise.resolve(!!localStorage.getItem(storageKey(userId)))
+  return Promise.resolve(!!lsGet(storageKey(userId)))
 }
 
 export function getProfile(userId: string): Promise<OracleProfile | undefined> {
   if (typeof window === 'undefined') return Promise.resolve(undefined)
-  const raw = localStorage.getItem(storageKey(userId))
+  const raw = lsGet(storageKey(userId))
   if (!raw) return Promise.resolve(undefined)
   try {
     return Promise.resolve(JSON.parse(raw) as OracleProfile)
@@ -25,6 +33,6 @@ export function getProfile(userId: string): Promise<OracleProfile | undefined> {
 
 export function saveProfile(profile: OracleProfile): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve()
-  localStorage.setItem(storageKey(profile.userId), JSON.stringify(profile))
+  lsSet(storageKey(profile.userId), JSON.stringify(profile))
   return Promise.resolve()
 }

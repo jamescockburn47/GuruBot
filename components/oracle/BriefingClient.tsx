@@ -16,10 +16,16 @@ export function BriefingClient({ userId }: Props) {
 
   useEffect(() => {
     async function init() {
-      const exists = await hasProfile(userId)
-      if (!exists) { router.push('/onboarding'); return }
-      const p = await getProfile(userId)
-      setProfile(p!)
+      try {
+        const exists = await hasProfile(userId)
+        if (!exists) { router.push('/onboarding'); return }
+        const p = await getProfile(userId)
+        if (!p) { router.push('/onboarding'); return }
+        setProfile(p)
+      } catch (err) {
+        console.error('BriefingClient init failed:', err)
+        router.push('/onboarding')
+      }
     }
     init()
   }, [userId, router])

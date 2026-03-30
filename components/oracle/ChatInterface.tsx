@@ -31,18 +31,24 @@ export function ChatInterface({ userId }: Props) {
 
   useEffect(() => {
     async function init() {
-      const profileExists = await hasProfile(userId)
-      if (!profileExists) { router.push('/onboarding'); return }
+      try {
+        const profileExists = await hasProfile(userId)
+        if (!profileExists) { router.push('/onboarding'); return }
 
-      const p = await getProfile(userId)
-      setProfile(p!)
+        const p = await getProfile(userId)
+        if (!p) { router.push('/onboarding'); return }
+        setProfile(p)
 
-      const allSessions = await getSessions(userId)
-      setSessions(allSessions)
+        const allSessions = await getSessions(userId)
+        setSessions(allSessions)
 
-      const session = allSessions[0] ?? await createSession(userId)
-      setCurrentSession(session)
-      setReady(true)
+        const session = allSessions[0] ?? await createSession(userId)
+        setCurrentSession(session)
+        setReady(true)
+      } catch (err) {
+        console.error('ChatInterface init failed:', err)
+        router.push('/onboarding')
+      }
     }
     init()
   }, [userId, router])
