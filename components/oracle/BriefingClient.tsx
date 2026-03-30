@@ -18,17 +18,18 @@ export function BriefingClient({ userId }: Props) {
     async function init() {
       try {
         const exists = await hasProfile(userId)
-        if (!exists) { router.push('/onboarding'); return }
+        if (!exists) { window.location.href = '/onboarding'; return }
         const p = await getProfile(userId)
-        if (!p) { router.push('/onboarding'); return }
+        if (!p) { window.location.href = '/onboarding'; return }
         setProfile(p)
       } catch (err) {
         console.error('BriefingClient init failed:', err)
-        router.push('/onboarding')
+        window.location.href = '/onboarding'
       }
     }
     init()
-  }, [userId, router])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
 
   if (!profile) {
     return (

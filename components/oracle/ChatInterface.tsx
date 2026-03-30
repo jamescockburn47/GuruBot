@@ -33,10 +33,10 @@ export function ChatInterface({ userId }: Props) {
     async function init() {
       try {
         const profileExists = await hasProfile(userId)
-        if (!profileExists) { router.push('/onboarding'); return }
+        if (!profileExists) { window.location.href = '/onboarding'; return }
 
         const p = await getProfile(userId)
-        if (!p) { router.push('/onboarding'); return }
+        if (!p) { window.location.href = '/onboarding'; return }
         setProfile(p)
 
         const allSessions = await getSessions(userId)
@@ -47,11 +47,12 @@ export function ChatInterface({ userId }: Props) {
         setReady(true)
       } catch (err) {
         console.error('ChatInterface init failed:', err)
-        router.push('/onboarding')
+        window.location.href = '/onboarding'
       }
     }
     init()
-  }, [userId, router])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
 
   // Use a ref so the transport always sends the current profile
   const profileRef = useRef<OracleProfile | null>(null)
