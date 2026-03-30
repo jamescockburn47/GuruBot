@@ -2,20 +2,8 @@
 import { streamText, convertToModelMessages } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 import { auth } from '@clerk/nextjs/server'
-import { Ratelimit } from '@upstash/ratelimit'
-import { Redis } from '@upstash/redis'
 import { buildSystemPrompt } from '@/lib/systemPrompt'
 import type { OracleProfile } from '@/lib/types'
-
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-})
-
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(20, '1 m'),
-})
 
 const CAP = 200
 
@@ -38,17 +26,6 @@ export async function POST(req: Request) {
   const { userId } = await auth()
   if (!userId) {
     return new Response('Unauthorized', { status: 401 })
-  }
-
-  // Rate limiting
-  const { success } = await ratelimit.limit(userId)
-  if (!success) {
-    return new Response(
-      JSON.stringify({
-        error: 'The oracle needs a moment to gather its thoughts. Please wait before seeking further guidance.',
-      }),
-      { status: 429, headers: { 'Content-Type': 'application/json' } }
-    )
   }
 
   // Parse body
