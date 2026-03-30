@@ -26,5 +26,5 @@ export default function SignUpPage() {
     return <DisclaimerModal onAccept={() => setAccepted(true)} />
   }
 
-  return <SignUp appearance={clerkAppearance} />
+  return <SignUp appearance={clerkAppearance} forceRedirectUrl="/onboarding" />
 }
