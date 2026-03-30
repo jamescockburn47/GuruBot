@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { useRouter } from 'next/navigation'
+import { useClerk } from '@clerk/nextjs'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MessageList } from './MessageList'
 import { InputBar } from './InputBar'
@@ -20,6 +21,7 @@ interface Props {
 
 export function ChatInterface({ userId }: Props) {
   const router = useRouter()
+  const { signOut } = useClerk()
   const [profile, setProfile] = useState<OracleProfile | null>(null)
   const [currentSession, setCurrentSession] = useState<OracleSession | null>(null)
   const [sessions, setSessions] = useState<OracleSession[]>([])
@@ -165,6 +167,12 @@ export function ChatInterface({ userId }: Props) {
             className="text-muted hover:text-gold transition-colors text-xs font-sans tracking-widest uppercase"
           >
             + New
+          </button>
+          <button
+            onClick={() => signOut({ redirectUrl: '/sign-in' })}
+            className="text-muted hover:text-gold transition-colors text-xs font-sans tracking-widest uppercase"
+          >
+            Sign out
           </button>
         </div>
       </div>
