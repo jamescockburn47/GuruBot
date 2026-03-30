@@ -38,6 +38,13 @@ export async function compressImage(file: File): Promise<CompressedImage> {
         }
 
         const base64 = dataUrl.split(',')[1]
+        
+        // Final size check after quality reduction
+        if (base64.length * 0.75 > MAX_BYTES) {
+          reject(new Error(`Image too large to compress below 4MB. Please use a smaller image.`))
+          return
+        }
+        
         resolve({ base64, mimeType: 'image/jpeg', width, height })
       }
       img.onerror = reject

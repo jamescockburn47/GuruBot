@@ -15,9 +15,15 @@ interface OracleDB {
 }
 
 let dbInstance: IDBPDatabase<OracleDB> | null = null
+let dbUserId: string | null = null
 
 export async function getDB(userId: string): Promise<IDBPDatabase<OracleDB>> {
-  if (dbInstance) return dbInstance
+  if (dbInstance && dbUserId === userId) return dbInstance
+  if (dbInstance) {
+    dbInstance.close()
+    dbInstance = null
+  }
+  dbUserId = userId
   dbInstance = await openDB<OracleDB>(`oracle-${userId}`, 1, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('profile')) {
@@ -33,5 +39,9 @@ export async function getDB(userId: string): Promise<IDBPDatabase<OracleDB>> {
 }
 
 export function resetDB() {
-  dbInstance = null
+  if (dbInstance) {
+    dbInstance.close()
+    dbInstance = null
+  }
+  dbUserId = null
 }

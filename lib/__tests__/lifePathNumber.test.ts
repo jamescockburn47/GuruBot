@@ -18,4 +18,8 @@ describe('calcLifePathNumber', () => {
     // 2000-01-01: 2+0+0+0+0+1+0+1 = 4
     expect(calcLifePathNumber('2000-01-01')).toBe(4)
   })
+  it('preserves master number 33', () => {
+    // 1994-11-08: 1+9+9+4+1+1+0+8 = 33
+    expect(calcLifePathNumber('1994-11-08')).toBe(33)
+  })
 })

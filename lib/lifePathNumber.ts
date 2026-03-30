@@ -4,7 +4,7 @@ function sumDigits(n: number): number {
 }
 
 function reduce(n: number): number {
-  if (n === 11 || n === 22) return n
+  if (n === 11 || n === 22 || n === 33) return n
   if (n < 10) return n
   return reduce(sumDigits(n))
 }
