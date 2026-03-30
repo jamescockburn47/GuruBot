@@ -12,17 +12,19 @@ export function InputBar({ onSend, disabled }: InputBarProps) {
   const [text, setText] = useState('')
   const [pendingImage, setPendingImage] = useState<CompressedImage | null>(null)
   const [compressing, setCompressing] = useState(false)
+  const [imageError, setImageError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     setCompressing(true)
+    setImageError(null)
     try {
       const compressed = await compressImage(file)
       setPendingImage(compressed)
     } catch (err) {
-      console.error('Image compression failed:', err)
+      setImageError(err instanceof Error ? err.message : 'Image could not be attached')
     } finally {
       setCompressing(false)
       if (fileRef.current) fileRef.current.value = ''
@@ -45,6 +47,9 @@ export function InputBar({ onSend, disabled }: InputBarProps) {
 
   return (
     <div className="border-t border-border px-4 py-3 space-y-2">
+      {imageError && (
+        <p className="text-xs font-sans text-red-400 px-1">{imageError}</p>
+      )}
       {pendingImage && (
         <div className="flex items-center gap-2">
           <img

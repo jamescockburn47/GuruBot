@@ -3,6 +3,23 @@ import { useEffect, useRef } from 'react'
 import type { UIMessage } from 'ai'
 import { Streamdown } from 'streamdown'
 
+function CrystalOrb() {
+  return (
+    <div className="relative w-6 h-6 flex-shrink-0">
+      <div
+        className="absolute inset-0 rounded-full border border-gold opacity-15 animate-ping"
+        style={{ animationDuration: '2.4s' }}
+      />
+      <div className="absolute inset-[2px] rounded-full border border-gold opacity-25 animate-pulse" />
+      <div
+        className="absolute inset-[5px] rounded-full bg-gold opacity-10 animate-pulse"
+        style={{ animationDelay: '0.4s' }}
+      />
+      <div className="absolute inset-[9px] rounded-full bg-gold opacity-50" />
+    </div>
+  )
+}
+
 interface MessageListProps {
   messages: UIMessage[]
   isStreaming: boolean
@@ -63,7 +80,12 @@ export function MessageList({ messages, isStreaming }: MessageListProps) {
         {isStreaming && messages[messages.length - 1]?.role !== 'assistant' && (
           <div className="flex justify-start">
             <div className="border-l-2 border-oracle-border pl-4 bg-oracle-bg px-4 py-3">
-              <span className="text-gold text-sm animate-pulse">✦</span>
+              <div className="flex items-center gap-3">
+                <CrystalOrb />
+                <span className="text-muted font-sans text-[10px] tracking-[0.2em] uppercase animate-pulse">
+                  Consulting the oracle
+                </span>
+              </div>
             </div>
           </div>
         )}

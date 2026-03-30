@@ -88,7 +88,7 @@ export function OnboardingFlow({ userId }: Props) {
       },
     })
 
-    startTransition(() => router.push('/oracle'))
+    startTransition(() => router.push('/oracle/briefing'))
   }
 
   async function handleAnswer(value: string | string[]) {

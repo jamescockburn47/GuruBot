@@ -1,5 +1,5 @@
 // lib/compressImage.ts
-const MAX_BYTES = 4 * 1024 * 1024 // 4MB
+const MAX_BYTES = 1.5 * 1024 * 1024 // 1.5MB — keeps base64 under Vercel's 4.5MB body limit
 const MAX_DIMENSION = 2048
 
 export interface CompressedImage {
