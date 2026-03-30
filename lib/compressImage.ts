@@ -1,6 +1,6 @@
 // lib/compressImage.ts
-const MAX_BYTES = 1.5 * 1024 * 1024 // 1.5MB — keeps base64 under Vercel's 4.5MB body limit
-const MAX_DIMENSION = 2048
+const MAX_BYTES = 300 * 1024 // 300KB binary → ~400KB base64, safe for repeated sends
+const MAX_DIMENSION = 768  // sufficient for Claude vision; phone photos are overkill beyond this
 
 export interface CompressedImage {
   base64: string       // without data: URL prefix
@@ -29,19 +29,19 @@ export async function compressImage(file: File): Promise<CompressedImage> {
         const ctx = canvas.getContext('2d')!
         ctx.drawImage(img, 0, 0, width, height)
 
-        let quality = 0.92
+        let quality = 0.85
         let dataUrl = canvas.toDataURL('image/jpeg', quality)
 
-        while (dataUrl.length * 0.75 > MAX_BYTES && quality > 0.1) {
-          quality -= 0.1
+        // Fine-grained quality reduction until under limit
+        while (dataUrl.length * 0.75 > MAX_BYTES && quality > 0.05) {
+          quality = Math.max(0.05, quality - 0.05)
           dataUrl = canvas.toDataURL('image/jpeg', quality)
         }
 
         const base64 = dataUrl.split(',')[1]
-        
-        // Final size check after quality reduction
+
         if (base64.length * 0.75 > MAX_BYTES) {
-          reject(new Error(`Image too large to compress below 4MB. Please use a smaller image.`))
+          reject(new Error('Image could not be compressed small enough. Try a different photo.'))
           return
         }
         
