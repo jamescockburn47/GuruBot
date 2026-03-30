@@ -16,13 +16,12 @@ const DISCLAIMER_ITEMS = [
 ]
 
 interface DisclaimerModalProps {
-  open: boolean
   onAccept: () => void
 }
 
-export function DisclaimerModal({ open, onAccept }: DisclaimerModalProps) {
+export function DisclaimerModal({ onAccept }: DisclaimerModalProps) {
   return (
-    <Dialog open={open} onOpenChange={() => {}} disablePointerDismissal>
+    <Dialog open={true} onOpenChange={() => {}} disablePointerDismissal>
       <DialogContent className="bg-background border-border max-w-md">
         <DialogHeader>
           <div className="text-center text-gold text-2xl mb-2 select-none">◈</div>

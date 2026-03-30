@@ -23,7 +23,7 @@ export default function SignUpPage() {
   const [accepted, setAccepted] = useState(false)
 
   if (!accepted) {
-    return <DisclaimerModal open={true} onAccept={() => setAccepted(true)} />
+    return <DisclaimerModal onAccept={() => setAccepted(true)} />
   }
 
   return <SignUp appearance={clerkAppearance} />
