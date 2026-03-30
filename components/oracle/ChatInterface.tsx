@@ -45,14 +45,23 @@ export function ChatInterface({ userId }: Props) {
     init()
   }, [userId, router])
 
-  // Recreate transport when profile changes so body stays current
+  // Use a ref so the transport always sends the current profile
+  const profileRef = useRef<OracleProfile | null>(null)
+  profileRef.current = profile
+
   const transport = useMemo(
     () => new DefaultChatTransport({
       api: '/api/chat',
-      body: { profile },
+      fetch: async (url, init) => {
+        if (init?.body && typeof init.body === 'string') {
+          const parsed = JSON.parse(init.body)
+          parsed.profile = profileRef.current
+          return fetch(url, { ...init, body: JSON.stringify(parsed) })
+        }
+        return fetch(url, init)
+      },
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [profile?.userId]
+    [] // created once — profile injected via ref on every request
   )
 
   const { messages, sendMessage, status, setMessages } = useChat({
