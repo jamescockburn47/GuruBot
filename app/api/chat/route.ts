@@ -35,19 +35,24 @@ export async function POST(req: Request) {
     const body = await req.json() as { messages: unknown[]; profile: OracleProfile }
     messages = body.messages
     profile = body.profile
-  } catch {
+    console.log('GURU_DEBUG: body keys', Object.keys(body), 'profile?', !!profile, 'messages?', Array.isArray(messages))
+  } catch (e) {
+    console.error('GURU_DEBUG: body parse failed', e)
     return new Response('Invalid request body', { status: 400 })
   }
 
   // Validate profile
   if (!profile || typeof profile !== 'object') {
-    return new Response('Invalid profile: missing or not object', { status: 400 })
+    console.error('GURU_DEBUG: missing or not object', JSON.stringify(profile))
+    return new Response('Invalid profile', { status: 400 })
   }
   if (profile.userId !== userId) {
-    return new Response(`Invalid profile: userId mismatch (profile=${profile.userId} auth=${userId})`, { status: 400 })
+    console.error(`GURU_DEBUG: userId mismatch profile=${profile.userId} auth=${userId}`)
+    return new Response('Invalid profile', { status: 400 })
   }
   if (typeof profile.name !== 'string' || typeof profile.dob !== 'string' || typeof profile.starSign !== 'string' || typeof profile.focus !== 'string' || typeof profile.energyState !== 'string' || !Array.isArray(profile.modalities)) {
-    return new Response(`Invalid profile: bad fields (name=${typeof profile.name} dob=${typeof profile.dob} star=${typeof profile.starSign} focus=${typeof profile.focus} energy=${typeof profile.energyState} mod=${Array.isArray(profile.modalities)})`, { status: 400 })
+    console.error(`GURU_DEBUG: bad fields name=${typeof profile.name} dob=${typeof profile.dob} star=${typeof profile.starSign} focus=${typeof profile.focus} energy=${typeof profile.energyState} mod=${Array.isArray(profile.modalities)}`)
+    return new Response('Invalid profile', { status: 400 })
   }
 
   // Sanitize profile fields (length-cap to prevent prompt injection)
