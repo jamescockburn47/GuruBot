@@ -22,8 +22,8 @@ interface DisclaimerModalProps {
 
 export function DisclaimerModal({ open, onAccept }: DisclaimerModalProps) {
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="bg-background border-border max-w-md" onPointerDownOutside={e => e.preventDefault()}>
+    <Dialog open={open} onOpenChange={() => {}} disablePointerDismissal>
+      <DialogContent className="bg-background border-border max-w-md">
         <DialogHeader>
           <div className="text-center text-gold text-2xl mb-2 select-none">◈</div>
           <DialogTitle className="font-serif text-center tracking-widest uppercase text-sm text-foreground">
