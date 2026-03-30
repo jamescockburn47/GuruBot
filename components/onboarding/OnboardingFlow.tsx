@@ -45,7 +45,7 @@ export function OnboardingFlow({ userId }: Props) {
       lifePathNumber: calcLifePathNumber(dob),
       focus: next[4] as string,
       energyState: next[5] as string,
-      modalities: next[6] as string[],
+      modalities: Array.isArray(next[6]) ? (next[6] as string[]) : [],
       createdAt: new Date().toISOString(),
     }
 

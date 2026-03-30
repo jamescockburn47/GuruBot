@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { useRouter } from 'next/navigation'
@@ -25,6 +25,7 @@ export function ChatInterface({ userId }: Props) {
   const [sessions, setSessions] = useState<OracleSession[]>([])
   const [panelOpen, setPanelOpen] = useState(false)
   const [ready, setReady] = useState(false)
+  const lastPersistedMsgIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     async function init() {
@@ -78,6 +79,7 @@ export function ChatInterface({ userId }: Props) {
     if (status === 'streaming' || status === 'submitted') return
     const lastMsg = messages[messages.length - 1]
     if (lastMsg.role !== 'assistant') return
+    if (lastMsg.id === lastPersistedMsgIdRef.current) return
 
     const text = lastMsg.parts
       ?.filter(p => p.type === 'text')
@@ -85,6 +87,7 @@ export function ChatInterface({ userId }: Props) {
       .join('') ?? ''
     if (!text) return
 
+    lastPersistedMsgIdRef.current = lastMsg.id
     const updated = appendMessage(currentSession, { role: 'assistant', content: text, timestamp: new Date().toISOString() })
     setCurrentSession(updated)
     updateSession(userId, updated)
@@ -95,7 +98,8 @@ export function ChatInterface({ userId }: Props) {
   async function handleSend(text: string, image?: CompressedImage) {
     if (!currentSession || !profile) return
 
-    const updated = appendMessage(currentSession, { role: 'user', content: text, timestamp: new Date().toISOString() })
+    const persistedContent = image ? `${text}\n[Image attached]`.trim() : text
+    const updated = appendMessage(currentSession, { role: 'user', content: persistedContent, timestamp: new Date().toISOString() })
     setCurrentSession(updated)
     updateSession(userId, updated)
 
