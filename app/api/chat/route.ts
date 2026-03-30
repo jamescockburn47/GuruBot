@@ -40,18 +40,14 @@ export async function POST(req: Request) {
   }
 
   // Validate profile
-  if (
-    !profile ||
-    typeof profile !== 'object' ||
-    profile.userId !== userId ||
-    typeof profile.name !== 'string' ||
-    typeof profile.dob !== 'string' ||
-    typeof profile.starSign !== 'string' ||
-    typeof profile.focus !== 'string' ||
-    typeof profile.energyState !== 'string' ||
-    !Array.isArray(profile.modalities)
-  ) {
-    return new Response('Invalid profile', { status: 400 })
+  if (!profile || typeof profile !== 'object') {
+    return new Response('Invalid profile: missing or not object', { status: 400 })
+  }
+  if (profile.userId !== userId) {
+    return new Response(`Invalid profile: userId mismatch (profile=${profile.userId} auth=${userId})`, { status: 400 })
+  }
+  if (typeof profile.name !== 'string' || typeof profile.dob !== 'string' || typeof profile.starSign !== 'string' || typeof profile.focus !== 'string' || typeof profile.energyState !== 'string' || !Array.isArray(profile.modalities)) {
+    return new Response(`Invalid profile: bad fields (name=${typeof profile.name} dob=${typeof profile.dob} star=${typeof profile.starSign} focus=${typeof profile.focus} energy=${typeof profile.energyState} mod=${Array.isArray(profile.modalities)})`, { status: 400 })
   }
 
   // Sanitize profile fields (length-cap to prevent prompt injection)
@@ -69,7 +65,7 @@ export async function POST(req: Request) {
   }
 
   const result = streamText({
-    model: anthropic('claude-sonnet-4.6'),
+    model: anthropic('claude-sonnet-4-6'),
     system: buildSystemPrompt(safeProfile),
     messages: modelMessages,
   })
