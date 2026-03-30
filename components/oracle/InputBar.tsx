@@ -74,7 +74,7 @@ export function InputBar({ onSend, disabled }: InputBarProps) {
         <input
           ref={fileRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/*"
           className="hidden"
           onChange={handleFileSelect}
         />

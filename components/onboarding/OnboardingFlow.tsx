@@ -1,11 +1,19 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useUser } from '@clerk/nextjs'
 import { QuestionCard } from './QuestionCard'
 import { saveProfile } from '@/lib/profile'
 import { calcLifePathNumber } from '@/lib/lifePathNumber'
 import { getStarSign } from '@/lib/starSign'
 import type { OracleProfile } from '@/lib/types'
+
+interface OracleStableMeta {
+  name: string
+  dob: string
+  placeOfBirth?: string
+  timeOfBirth?: string
+}
 
 const STEPS = [
   { question: 'What shall I call you?',          type: 'text'   as const, options: [], optional: false },
@@ -23,9 +31,25 @@ interface Props {
 
 export function OnboardingFlow({ userId }: Props) {
   const router = useRouter()
+  const { user } = useUser()
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<Record<number, string | string[]>>({})
   const [, startTransition] = useTransition()
+
+  // If stable profile already in Clerk metadata, skip to session questions
+  useEffect(() => {
+    if (!user) return
+    const stable = user.unsafeMetadata?.oracleStable as OracleStableMeta | undefined
+    if (stable?.name && stable?.dob) {
+      setAnswers({
+        0: stable.name,
+        1: stable.dob,
+        2: stable.placeOfBirth ?? '',
+        3: stable.timeOfBirth ?? '',
+      })
+      setStep(4)
+    }
+  }, [user])
 
   async function advance(next: Record<number, string | string[]>) {
     if (step < STEPS.length - 1) {
@@ -50,6 +74,20 @@ export function OnboardingFlow({ userId }: Props) {
     }
 
     await saveProfile(profile)
+
+    // Persist stable fields to Clerk so any future device skips re-entry
+    await user?.update({
+      unsafeMetadata: {
+        ...user.unsafeMetadata,
+        oracleStable: {
+          name: profile.name,
+          dob: profile.dob,
+          placeOfBirth: profile.placeOfBirth,
+          timeOfBirth: profile.timeOfBirth,
+        } satisfies OracleStableMeta,
+      },
+    })
+
     startTransition(() => router.push('/oracle'))
   }
 
