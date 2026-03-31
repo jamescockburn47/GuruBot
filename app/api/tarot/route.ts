@@ -79,7 +79,7 @@ Weave the meanings of these randomly drawn cards together with the Seeker's curr
     })
 
     const result = await streamText({
-      model: minimax('MiniMax-M2.7'),
+      model: minimax.chat('MiniMax-M2.7'),
       system: systemPrompt,
       messages: [
         {

@@ -91,7 +91,7 @@ Do not describe your actions or use asterisks. Speak directly, atmospherically, 
     })
 
     const result = await streamText({
-      model: minimax('MiniMax-M2.7'),
+      model: minimax.chat('MiniMax-M2.7'),
       system: systemPrompt,
       messages: [
         {

@@ -75,7 +75,7 @@ export async function POST(req: Request) {
   })
 
   const result = streamText({
-    model: minimax('MiniMax-M2.7'),
+    model: minimax.chat('MiniMax-M2.7'),
     system: buildSystemPrompt(safeProfile),
     messages: modelMessages,
   })
