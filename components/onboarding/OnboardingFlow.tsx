@@ -44,6 +44,8 @@ export function OnboardingFlow({ userId }: Props) {
       setAnswers(prev => {
         // Only inject if they haven't started answering questions themselves
         if (Object.keys(prev).length > 0) return prev
+        // Briefly show a welcome back toast or visually indicate we remembered their details!
+        // Because of React state batching, jumping to step 4 makes users feel they lost their data.
         setStep(4)
         return {
           0: stable.name,
@@ -54,6 +56,9 @@ export function OnboardingFlow({ userId }: Props) {
       })
     }
   }, [user])
+
+  // Get known name if skipping steps
+  const knownName = answers[0] as string | undefined;
 
   async function advance(next: Record<number, string | string[]>) {
     if (step < STEPS.length - 1) {
@@ -132,7 +137,11 @@ export function OnboardingFlow({ userId }: Props) {
 
       <QuestionCard
         key={step}
-        question={current.question}
+        question={
+          step === 4 && knownName 
+            ? `Welcome back, ${knownName.split(' ')[0]}. ${current.question}` 
+            : current.question
+        }
         type={current.type}
         options={current.options}
         optional={current.optional}

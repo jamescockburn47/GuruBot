@@ -45,8 +45,15 @@ export async function getDB(userId: string): Promise<IDBPDatabase<OracleDB>> {
     },
     blocking() {
       // Automatically close the connection if another tab wants to upgrade
-      dbPromise?.then(db => db.close())
-      dbPromise = null
+      console.warn('IDB blocking: Another tab is upgrading the database. Closing connection.')
+      if (dbPromise) {
+        dbPromise.then(db => db.close()).catch(() => {})
+        dbPromise = null
+      }
+    },
+    blocked(currentVersion, blockedVersion, event) {
+      console.warn(`IDB blocked: Waiting for other tabs to close before upgrading to ${blockedVersion}.`)
+      // Not much we can do here except wait or alert user, but throwing an explicit error could let the app recover by wiping itself
     },
   })
   

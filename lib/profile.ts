@@ -25,8 +25,16 @@ export function getProfile(userId: string): Promise<OracleProfile | undefined> {
   const raw = lsGet(storageKey(userId))
   if (!raw) return Promise.resolve(undefined)
   try {
-    return Promise.resolve(JSON.parse(raw) as OracleProfile)
+    const parsed = JSON.parse(raw) as OracleProfile
+    // Validate required fields explicitly to prevent crashes from outdated/corrupted schema
+    if (!parsed.name || !parsed.dob || !parsed.starSign || !parsed.focus || !parsed.energyState || !Array.isArray(parsed.modalities)) {
+      console.warn('Profile in storage is missing required fields. Prompting onboarding.')
+      localStorage.removeItem(storageKey(userId))
+      return Promise.resolve(undefined)
+    }
+    return Promise.resolve(parsed)
   } catch {
+    localStorage.removeItem(storageKey(userId))
     return Promise.resolve(undefined)
   }
 }
