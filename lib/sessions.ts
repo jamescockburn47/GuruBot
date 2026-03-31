@@ -1,6 +1,6 @@
-// lib/sessions.ts
 import { getDB } from './db'
 import { v4 as uuidv4 } from 'uuid'
+import { stripThinking } from './stripThinking'
 import type { OracleSession, SessionMessage, VisionReading } from './types'
 
 export async function createSession(userId: string): Promise<OracleSession> {
@@ -34,7 +34,7 @@ export async function updateSession(userId: string, session: OracleSession): Pro
 export function appendMessage(session: OracleSession, message: SessionMessage): OracleSession {
   const updated = { ...session, messages: [...session.messages, message] }
   if (updated.title === 'New Reading' && message.role === 'assistant') {
-    updated.title = message.content.slice(0, 60).replace(/[*#]/g, '').trim()
+    updated.title = stripThinking(message.content).slice(0, 60).replace(/[*#]/g, '').trim()
   }
   return updated
 }

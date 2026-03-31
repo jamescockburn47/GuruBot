@@ -57,7 +57,7 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: minimax.chat('MiniMax-M2.7'),
-    system: `You are an unnamed oracle delivering a brief personal daily cosmic briefing. Speak directly — no stage directions, no physical actions in asterisks. Atmospheric, specific, and concise. Under 180 words total across three paragraphs. CRITICAL: DO NOT output any internal thinking, reasoning, or planning. Begin the briefing immediately.`,
+    system: `You are an unnamed oracle delivering a brief personal daily cosmic briefing. Speak directly — no stage directions, no physical actions in asterisks. Atmospheric, specific, and concise. Under 180 words total across three paragraphs. CRITICAL: You MUST place all of your internal planning and reasoning strictly inside <think>...</think> tags. Do not output reasoning outside of these tags. Begin the briefing immediately.`,
     messages: [{
       role: 'user',
       content: `Today is ${dateStr}.

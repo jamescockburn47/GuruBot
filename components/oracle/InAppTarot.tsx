@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Streamdown } from 'streamdown'
 import { v4 as uuidv4 } from 'uuid'
+import { stripThinking } from '@/lib/stripThinking'
 import type { OracleProfile } from '@/lib/types'
 import { drawRandomCards, type TarotCard } from '@/lib/tarotData'
 import { saveVisionReading } from '@/lib/sessions'
@@ -155,7 +156,7 @@ export function InAppTarot({ userId, profile, onClose }: Props) {
               {isReading && <span className="animate-pulse">◯</span>}
             </div>
             <div className="font-serif text-[15px] text-foreground leading-relaxed space-y-4">
-              <Streamdown>{resultText}</Streamdown>
+              <Streamdown>{stripThinking(resultText)}</Streamdown>
             </div>
           </div>
         ) : null}

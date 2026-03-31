@@ -74,7 +74,7 @@ Instruction:
 Weave the meanings of these randomly drawn cards together with the Seeker's current focus and energy state. Speak directly, atmospherically, and concisely. 
 CRITICAL RULES:
 1. Do not describe your actions or use asterisks.
-2. DO NOT output any internal thinking, reasoning, or planning. 
+2. You MUST place all of your internal planning and reasoning strictly inside <think>...</think> tags. Do not output reasoning outside of these tags.
 3. DO NOT repeat the prompt instructions or seeker's profile data.
 4. Begin the reading immediately.`
 

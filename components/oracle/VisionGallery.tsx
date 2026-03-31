@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { getProfile, hasProfile } from '@/lib/profile'
 import { saveVisionReading, getVisionReadings } from '@/lib/sessions'
 import { Streamdown } from 'streamdown'
+import { stripThinking } from '@/lib/stripThinking'
 import type { OracleProfile, VisionReadingType, VisionReading } from '@/lib/types'
 import { v4 as uuidv4 } from 'uuid'
 import { InAppTarot } from './InAppTarot'
@@ -272,7 +273,7 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
                   {isReading && <span className="animate-pulse">◯</span>}
                 </div>
                 <div className="font-serif text-[15px] text-foreground leading-relaxed space-y-4">
-                  <Streamdown>{resultText}</Streamdown>
+                  <Streamdown>{stripThinking(resultText)}</Streamdown>
                 </div>
               </div>
             ) : null}

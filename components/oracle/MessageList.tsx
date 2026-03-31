@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react'
 import type { UIMessage } from 'ai'
 import { Streamdown } from 'streamdown'
+import { stripThinking } from '@/lib/stripThinking'
 
 function CrystalOrb() {
   return (
@@ -56,10 +57,10 @@ export function MessageList({ messages, isStreaming }: MessageListProps) {
                 <div className="border-l-2 border-oracle-border pl-4 bg-oracle-bg px-4 py-3">
                   <div className="font-serif text-sm text-foreground leading-relaxed">
                     <Streamdown>
-                      {message.parts
+                      {stripThinking(message.parts
                         ?.filter(p => p.type === 'text')
                         .map(p => (p as { type: 'text'; text: string }).text)
-                        .join('') ?? ''}
+                        .join('') ?? '')}
                     </Streamdown>
                   </div>
                 </div>

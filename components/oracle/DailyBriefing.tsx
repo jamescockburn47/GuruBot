@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { stripThinking } from '@/lib/stripThinking'
 import type { OracleProfile } from '@/lib/types'
 import type { MoonPhase } from '@/lib/astrology'
 
@@ -95,7 +96,7 @@ export function DailyBriefing({ profile, moon, currentSunSign, dateStr }: Props)
               </div>
             ) : (
               <p className="font-serif text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                {text}
+                {stripThinking(text)}
               </p>
             )}
           </div>

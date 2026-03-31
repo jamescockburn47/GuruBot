@@ -85,7 +85,7 @@ ${typePrompt}
 
 Provide a deep, mystical, and unvarnished reading of this imagery through the lens of their current state. Connect the visual elements to their path. Do not describe your actions or use asterisks. Speak directly, atmospherically, and concisely.
 CRITICAL RULES:
-1. DO NOT output any internal thinking, reasoning, or planning.
+1. You MUST place all of your internal planning and reasoning strictly inside <think>...</think> tags. Do not output reasoning outside of these tags.
 2. Begin the reading immediately.`
 
     const minimax = createOpenAI({
