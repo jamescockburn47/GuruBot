@@ -1,5 +1,5 @@
 import { streamText } from 'ai'
-import { createOpenAI } from '@ai-sdk/openai'
+import { createAnthropic } from '@ai-sdk/anthropic'
 import { auth } from '@clerk/nextjs/server'
 import type { OracleProfile, VisionReadingType } from '@/lib/types'
 
@@ -88,13 +88,12 @@ CRITICAL RULES:
 1. You MUST place all of your internal planning and reasoning strictly inside <think>...</think> tags. Do not output reasoning outside of these tags.
 2. Begin the reading immediately.`
 
-    const minimax = createOpenAI({
-      apiKey: process.env.MINIMAX_API_KEY,
-      baseURL: 'https://api.minimax.io/v1',
+    const anthropic = createAnthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
     })
 
     const result = await streamText({
-      model: minimax.chat('MiniMax-M2.7'),
+      model: anthropic('claude-3-5-sonnet-20240620'),
       system: systemPrompt,
       messages: [
         {

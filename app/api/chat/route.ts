@@ -1,6 +1,7 @@
 // app/api/chat/route.ts
 import { streamText, convertToModelMessages } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
+import { createAnthropic } from '@ai-sdk/anthropic'
 import { auth } from '@clerk/nextjs/server'
 import { buildSystemPrompt } from '@/lib/systemPrompt'
 import type { OracleProfile } from '@/lib/types'
@@ -74,8 +75,15 @@ export async function POST(req: Request) {
     baseURL: 'https://api.minimax.io/v1',
   })
 
+  const anthropic = createAnthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  })
+
+  const hasImage = modelMessages.some(m => Array.isArray(m.content) && m.content.some(c => c.type === 'image'))
+  const selectedModel = hasImage ? anthropic('claude-3-5-sonnet-20240620') : minimax.chat('MiniMax-M2.7')
+
   const result = streamText({
-    model: minimax.chat('MiniMax-M2.7'),
+    model: selectedModel,
     system: buildSystemPrompt(safeProfile),
     messages: modelMessages,
   })
