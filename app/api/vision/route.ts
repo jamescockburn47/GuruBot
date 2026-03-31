@@ -83,7 +83,10 @@ Energy State: ${safeProfile.energyState}
 Read the image specifically for the seeker based on this instruction:
 ${typePrompt}
 
-Do not describe your actions or use asterisks. Speak directly, atmospherically, and concisely.`
+Provide a deep, mystical, and unvarnished reading of this imagery through the lens of their current state. Connect the visual elements to their path. Do not describe your actions or use asterisks. Speak directly, atmospherically, and concisely.
+CRITICAL RULES:
+1. DO NOT output any internal thinking, reasoning, or planning.
+2. Begin the reading immediately.`
 
     const minimax = createOpenAI({
       apiKey: process.env.MINIMAX_API_KEY,

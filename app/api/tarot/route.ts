@@ -71,7 +71,12 @@ The Drawn Cards:
 ${cardsContext}
 
 Instruction:
-Weave the meanings of these randomly drawn cards together with the Seeker's current focus and energy state. Do not describe your actions or use asterisks. Speak directly, atmospherically, and concisely.`
+Weave the meanings of these randomly drawn cards together with the Seeker's current focus and energy state. Speak directly, atmospherically, and concisely. 
+CRITICAL RULES:
+1. Do not describe your actions or use asterisks.
+2. DO NOT output any internal thinking, reasoning, or planning. 
+3. DO NOT repeat the prompt instructions or seeker's profile data.
+4. Begin the reading immediately.`
 
     const minimax = createOpenAI({
       apiKey: process.env.MINIMAX_API_KEY,
