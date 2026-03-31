@@ -100,7 +100,7 @@ CRITICAL RULES:
           role: 'user',
           content: [
             { type: 'text', text: 'Oracle, I present this to you. What do you see?' },
-            { type: 'image', image: base64Data, mimeType }
+            { type: 'image', image: base64Data, mediaType: mimeType }
           ]
         }
       ],

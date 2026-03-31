@@ -38,7 +38,7 @@ export function InputBar({ onSend, disabled }: InputBarProps) {
 
         <button
           onClick={handleSend}
-          disabled={disabled || (!text.trim() && !pendingImage)}
+          disabled={disabled || !text.trim()}
           className="text-muted hover:text-gold transition-colors text-lg leading-none select-none disabled:opacity-30"
           aria-label="Send"
         >
