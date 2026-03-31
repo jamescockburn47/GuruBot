@@ -110,17 +110,28 @@ export function InAppTarot({ userId, profile, onClose }: Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
         {cards.map((card, i) => (
-          <div key={card.id} className="relative aspect-[2/3] perspective-1000 w-full max-w-[240px] mx-auto cursor-pointer" onClick={() => handleReveal(i)}>
-            <div className={`w-full h-full transition-transform duration-700 preserve-3d ${revealed[i] ? 'rotate-y-180' : ''}`}>
+          <div key={card.id} className="relative aspect-[2/3] w-full max-w-[240px] mx-auto cursor-pointer" style={{ perspective: '1000px' }} onClick={() => handleReveal(i)}>
+            <div 
+              className="w-full h-full transition-transform duration-700" 
+              style={{ transformStyle: 'preserve-3d', transform: revealed[i] ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
+            >
               {/* Back of Card */}
-              <div className="absolute inset-0 backface-hidden bg-oracle-bg flex items-center justify-center border-2 border-gold/40 shadow-xl overflow-hidden">
+              <div 
+                className="absolute inset-0 bg-oracle-bg flex items-center justify-center border-2 border-gold/60 shadow-xl overflow-hidden" 
+                style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
+              >
                 <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gold via-[#0a0a0a] to-[#000000]"></div>
-                <div className="text-gold opacity-50 text-4xl select-none">🎴</div>
+                <div className="absolute inset-3 border border-gold/30 rounded-sm"></div>
+                <div className="text-gold opacity-80 text-5xl select-none">🎴</div>
               </div>
+              
               {/* Front of Card */}
-              <div className="absolute inset-0 backface-hidden rotate-y-180 border-2 border-gold flex flex-col items-center bg-black">
-                <img src={card.imagePath} alt={card.name} className="w-full h-full object-cover" />
-                <div className="absolute bottom-0 inset-x-0 bg-black/80 backdrop-blur-sm p-3 text-center border-t border-gold/30">
+              <div 
+                className="absolute inset-0 rotate-y-180 border-2 border-gold flex flex-col items-center bg-black"
+                style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+              >
+                <img src={card.imagePath} alt={card.name} className="w-full h-full object-cover bg-black" />
+                <div className="absolute bottom-0 inset-x-0 bg-black/95 backdrop-blur-md p-3 text-center border-t border-gold/50 z-10">
                   <span className="font-serif text-sm tracking-widest uppercase text-gold">
                     {i === 0 ? 'Past' : i === 1 ? 'Present' : 'Future'}
                   </span>

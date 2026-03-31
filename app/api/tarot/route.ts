@@ -1,5 +1,5 @@
 import { streamText } from 'ai'
-import { anthropic } from '@ai-sdk/anthropic'
+import { createOpenAI } from '@ai-sdk/openai'
 import { auth } from '@clerk/nextjs/server'
 import type { OracleProfile } from '@/lib/types'
 import type { TarotCard } from '@/lib/tarotData'
@@ -73,8 +73,13 @@ ${cardsContext}
 Instruction:
 Weave the meanings of these randomly drawn cards together with the Seeker's current focus and energy state. Do not describe your actions or use asterisks. Speak directly, atmospherically, and concisely.`
 
+    const minimax = createOpenAI({
+      apiKey: process.env.MINIMAX_API_KEY,
+      baseURL: 'https://api.minimax.chat/v1',
+    })
+
     const result = await streamText({
-      model: anthropic('claude-sonnet-4-6'),
+      model: minimax('minimax-2.7'),
       system: systemPrompt,
       messages: [
         {

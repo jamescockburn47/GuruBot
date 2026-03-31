@@ -33,7 +33,7 @@ export async function getDB(userId: string): Promise<IDBPDatabase<OracleDB>> {
   dbUserId = userId
   // Assign the promise directly so concurrent calls wait on the same promise
   dbPromise = openDB<OracleDB>(`oracle-${userId}`, 3, {
-    upgrade(db) {
+    upgrade(db, oldVersion, newVersion, transaction) {
       if (!db.objectStoreNames.contains('sessions')) {
         const store = db.createObjectStore('sessions', { keyPath: 'id' })
         store.createIndex('by_started', 'startedAt')
@@ -42,6 +42,11 @@ export async function getDB(userId: string): Promise<IDBPDatabase<OracleDB>> {
         const store = db.createObjectStore('visions', { keyPath: 'id' })
         store.createIndex('by_created', 'createdAt')
       }
+    },
+    blocking() {
+      // Automatically close the connection if another tab wants to upgrade
+      dbPromise?.then(db => db.close())
+      dbPromise = null
     },
   })
   

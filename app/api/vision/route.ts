@@ -1,5 +1,5 @@
 import { streamText } from 'ai'
-import { anthropic } from '@ai-sdk/anthropic'
+import { createOpenAI } from '@ai-sdk/openai'
 import { auth } from '@clerk/nextjs/server'
 import type { OracleProfile, VisionReadingType } from '@/lib/types'
 
@@ -85,8 +85,13 @@ ${typePrompt}
 
 Do not describe your actions or use asterisks. Speak directly, atmospherically, and concisely.`
 
+    const minimax = createOpenAI({
+      apiKey: process.env.MINIMAX_API_KEY,
+      baseURL: 'https://api.minimax.chat/v1',
+    })
+
     const result = await streamText({
-      model: anthropic('claude-sonnet-4-6'),
+      model: minimax('minimax-2.7'),
       system: systemPrompt,
       messages: [
         {

@@ -1,5 +1,5 @@
 import { streamText } from 'ai'
-import { anthropic } from '@ai-sdk/anthropic'
+import { createOpenAI } from '@ai-sdk/openai'
 import { auth } from '@clerk/nextjs/server'
 import { getMoonPhase, getCurrentSunSign } from '@/lib/astrology'
 import type { OracleProfile } from '@/lib/types'
@@ -50,8 +50,13 @@ export async function POST(req: Request) {
     safe.timeOfBirth  ? `at ${safe.timeOfBirth}`       : null,
   ].filter(Boolean).join(', ')
 
+  const minimax = createOpenAI({
+    apiKey: process.env.MINIMAX_API_KEY,
+    baseURL: 'https://api.minimax.chat/v1',
+  })
+
   const result = streamText({
-    model: anthropic('claude-sonnet-4-6'),
+    model: minimax('minimax-2.7'),
     system: `You are an unnamed oracle delivering a brief personal daily cosmic briefing. Speak directly — no stage directions, no physical actions in asterisks. Atmospheric, specific, and concise. Under 180 words total across three paragraphs.`,
     messages: [{
       role: 'user',

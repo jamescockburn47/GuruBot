@@ -1,6 +1,6 @@
 // app/api/chat/route.ts
 import { streamText, convertToModelMessages } from 'ai'
-import { anthropic } from '@ai-sdk/anthropic'
+import { createOpenAI } from '@ai-sdk/openai'
 import { auth } from '@clerk/nextjs/server'
 import { buildSystemPrompt } from '@/lib/systemPrompt'
 import type { OracleProfile } from '@/lib/types'
@@ -69,8 +69,13 @@ export async function POST(req: Request) {
     return new Response('Invalid messages', { status: 400 })
   }
 
+  const minimax = createOpenAI({
+    apiKey: process.env.MINIMAX_API_KEY,
+    baseURL: 'https://api.minimax.chat/v1',
+  })
+
   const result = streamText({
-    model: anthropic('claude-sonnet-4-6'),
+    model: minimax('minimax-2.7'),
     system: buildSystemPrompt(safeProfile),
     messages: modelMessages,
   })
