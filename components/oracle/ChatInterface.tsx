@@ -4,6 +4,7 @@ import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { useRouter } from 'next/navigation'
 import { useClerk } from '@clerk/nextjs'
+import { v4 as uuidv4 } from 'uuid'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { MessageList } from './MessageList'
 import { InputBar } from './InputBar'
@@ -99,7 +100,7 @@ export function ChatInterface({ userId }: Props) {
     if (!currentSession) return
     setMessages(
       currentSession.messages.map(m => ({
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         role: m.role as 'user' | 'assistant',
         content: m.content,
         parts: [{ type: 'text' as const, text: m.content }],
@@ -180,6 +181,12 @@ export function ChatInterface({ userId }: Props) {
         <span className="text-gold opacity-40 text-lg select-none">◯</span>
         <div className="flex items-center gap-4">
           <ThemeToggle />
+          <button
+            onClick={() => router.push('/oracle/readings')}
+            className="text-gold border border-gold/30 px-3 py-1 bg-gold/5 transition-colors text-[10px] font-sans tracking-widest uppercase"
+          >
+            Visions
+          </button>
           <button
             onClick={() => setPanelOpen(true)}
             className="text-muted hover:text-gold transition-colors text-xs font-sans tracking-widest uppercase"

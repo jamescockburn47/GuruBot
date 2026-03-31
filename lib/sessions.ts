@@ -1,7 +1,7 @@
 // lib/sessions.ts
 import { getDB } from './db'
 import { v4 as uuidv4 } from 'uuid'
-import type { OracleSession, SessionMessage } from './types'
+import type { OracleSession, SessionMessage, VisionReading } from './types'
 
 export async function createSession(userId: string): Promise<OracleSession> {
   const db = await getDB(userId)
@@ -37,4 +37,15 @@ export function appendMessage(session: OracleSession, message: SessionMessage): 
     updated.title = message.content.slice(0, 60).replace(/[*#]/g, '').trim()
   }
   return updated
+}
+
+export async function saveVisionReading(userId: string, reading: VisionReading): Promise<void> {
+  const db = await getDB(userId)
+  await db.put('visions', reading)
+}
+
+export async function getVisionReadings(userId: string): Promise<VisionReading[]> {
+  const db = await getDB(userId)
+  const all = await db.getAll('visions')
+  return all.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 }

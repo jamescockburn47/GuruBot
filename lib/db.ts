@@ -1,41 +1,57 @@
 // lib/db.ts
-import { openDB, type IDBPDatabase } from 'idb'
-import type { OracleSession } from './types'
+import { openDB } from 'idb'
+import type { IDBPDatabase, DBSchema } from 'idb'
+import type { OracleSession, VisionReading } from './types'
 
-interface OracleDB {
+export interface OracleDB extends DBSchema {
   sessions: {
     key: string
     value: OracleSession
-    indexes: { by_started: string }
+    indexes: { 'by_started': string }
+  }
+  visions: {
+    key: string
+    value: VisionReading
+    indexes: { 'by_created': string }
   }
 }
 
-let dbInstance: IDBPDatabase<OracleDB> | null = null
+let dbPromise: Promise<IDBPDatabase<OracleDB>> | null = null
 let dbUserId: string | null = null
 
 export async function getDB(userId: string): Promise<IDBPDatabase<OracleDB>> {
-  if (dbInstance && dbUserId === userId) return dbInstance
-  if (dbInstance) {
-    dbInstance.close()
-    dbInstance = null
+  // Return the existing promise if it matches the userId
+  if (dbPromise && dbUserId === userId) return dbPromise
+  
+  // If there's an existing promise for a different user, wait for it and close it
+  if (dbPromise) {
+    const oldDb = await dbPromise.catch(() => null)
+    if (oldDb) oldDb.close()
+    dbPromise = null
   }
+  
   dbUserId = userId
-  dbInstance = await openDB<OracleDB>(`oracle-${userId}`, 2, {
+  // Assign the promise directly so concurrent calls wait on the same promise
+  dbPromise = openDB<OracleDB>(`oracle-${userId}`, 3, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('sessions')) {
         const store = db.createObjectStore('sessions', { keyPath: 'id' })
         store.createIndex('by_started', 'startedAt')
       }
-      // profile store removed — profile now lives in localStorage
+      if (!db.objectStoreNames.contains('visions')) {
+        const store = db.createObjectStore('visions', { keyPath: 'id' })
+        store.createIndex('by_created', 'createdAt')
+      }
     },
   })
-  return dbInstance
+  
+  return dbPromise
 }
 
 export function resetDB() {
-  if (dbInstance) {
-    dbInstance.close()
-    dbInstance = null
+  if (dbPromise) {
+    dbPromise.then(db => db.close()).catch(() => {})
+    dbPromise = null
   }
   dbUserId = null
 }

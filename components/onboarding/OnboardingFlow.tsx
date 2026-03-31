@@ -41,13 +41,17 @@ export function OnboardingFlow({ userId }: Props) {
     if (!user) return
     const stable = user.unsafeMetadata?.oracleStable as OracleStableMeta | undefined
     if (stable?.name && stable?.dob) {
-      setAnswers({
-        0: stable.name,
-        1: stable.dob,
-        2: stable.placeOfBirth ?? '',
-        3: stable.timeOfBirth ?? '',
+      setAnswers(prev => {
+        // Only inject if they haven't started answering questions themselves
+        if (Object.keys(prev).length > 0) return prev
+        setStep(4)
+        return {
+          0: stable.name,
+          1: stable.dob,
+          2: stable.placeOfBirth ?? '',
+          3: stable.timeOfBirth ?? '',
+        }
       })
-      setStep(4)
     }
   }, [user])
 
@@ -92,15 +96,22 @@ export function OnboardingFlow({ userId }: Props) {
   }
 
   async function handleAnswer(value: string | string[]) {
-    const next = { ...answers, [step]: value }
-    setAnswers(next)
-    await advance(next)
+    setAnswers(prev => {
+      const next = { ...prev, [step]: value }
+      // We must call advance outside the setter, but we need the next state.
+      // Since advance is async, we can just call it with next right here!
+      // To strictly avoid side-effects in reducer:
+      setTimeout(() => advance(next), 0)
+      return next
+    })
   }
 
   async function handleSkip() {
-    const next = { ...answers, [step]: '' }
-    setAnswers(next)
-    await advance(next)
+    setAnswers(prev => {
+      const next = { ...prev, [step]: '' }
+      setTimeout(() => advance(next), 0)
+      return next
+    })
   }
 
   const current = STEPS[step]
