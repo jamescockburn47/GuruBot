@@ -100,7 +100,7 @@ CRITICAL RULES:
           role: 'user',
           content: [
             { type: 'text', text: 'Oracle, I present this to you. What do you see?' },
-            { type: 'image', image: body.image }
+            { type: 'image', image: base64Data, mimeType }
           ]
         }
       ],
@@ -108,8 +108,15 @@ CRITICAL RULES:
 
     return result.toTextStreamResponse()
 
-  } catch (error) {
-    console.error('Vision API error:', error)
-    return new Response('Internal Server Error', { status: 500 })
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error)
+    const errStack = error instanceof Error ? error.stack : undefined
+    console.error('Vision API error:', errMsg)
+    if (errStack) console.error('Stack:', errStack)
+    // Surface a hint to the client for debugging
+    return new Response(
+      JSON.stringify({ error: 'Vision failed', detail: errMsg }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    )
   }
 }

@@ -13,8 +13,6 @@ import { getProfile, hasProfile } from '@/lib/profile'
 import { createSession, getSessions, updateSession, appendMessage } from '@/lib/sessions'
 import type { OracleProfile } from '@/lib/types'
 import type { OracleSession } from '@/lib/types'
-import type { CompressedImage } from '@/lib/compressImage'
-import type { FileUIPart } from 'ai'
 
 interface Props {
   userId: string
@@ -67,29 +65,12 @@ export function ChatInterface({ userId }: Props) {
         if (init?.body && typeof init.body === 'string') {
           const parsed = JSON.parse(init.body)
           parsed.profile = profileRef.current
-
-          // Strip file parts from every message except the last user message.
-          // AI SDK re-sends the full messages array each time; without this,
-          // a single image bloats every subsequent request and hits Vercel's body limit.
-          if (Array.isArray(parsed.messages) && parsed.messages.length > 0) {
-            const lastUserIdx = parsed.messages.reduce(
-              (acc: number, m: { role: string }, i: number) => m.role === 'user' ? i : acc,
-              -1
-            )
-            parsed.messages = parsed.messages.map((m: { role: string; parts?: { type: string }[] }, i: number) => {
-              if (i === lastUserIdx) return m
-              if (!Array.isArray(m.parts)) return m
-              const stripped = m.parts.filter((p: { type: string }) => p.type !== 'file')
-              return stripped.length === m.parts.length ? m : { ...m, parts: stripped }
-            })
-          }
-
           return fetch(url, { ...init, body: JSON.stringify(parsed) })
         }
         return fetch(url, init)
       },
     }),
-    [] // created once — profile and stripping logic applied via closure on every request
+    []
   )
 
   const { messages, sendMessage, status, setMessages } = useChat({
@@ -132,24 +113,14 @@ export function ChatInterface({ userId }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length, status])
 
-  async function handleSend(text: string, image?: CompressedImage) {
+  async function handleSend(text: string) {
     if (!currentSession || !profile) return
 
-    const persistedContent = image ? `${text}\n[Image attached]`.trim() : text
-    const updated = appendMessage(currentSession, { role: 'user', content: persistedContent, timestamp: new Date().toISOString() })
+    const updated = appendMessage(currentSession, { role: 'user', content: text, timestamp: new Date().toISOString() })
     setCurrentSession(updated)
     updateSession(userId, updated)
 
-    if (image) {
-      const filePart: FileUIPart = {
-        type: 'file',
-        mediaType: image.mimeType,
-        url: `data:${image.mimeType};base64,${image.base64}`,
-      }
-      sendMessage({ text, files: [filePart] })
-    } else {
-      sendMessage({ text })
-    }
+    sendMessage({ text })
   }
 
   async function handleNewReading() {

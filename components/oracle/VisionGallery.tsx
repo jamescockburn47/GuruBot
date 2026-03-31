@@ -136,7 +136,9 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
       })
 
       if (!res.ok) {
-        throw new Error('The Oracle could not see clearly. (Network Error)')
+        const errBody = await res.text()
+        console.error('Vision API response:', res.status, errBody)
+        throw new Error(`The Oracle could not see clearly. (${res.status})`)
       }
 
       const reader = res.body?.getReader()
@@ -208,7 +210,6 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
       <input
         type="file"
         accept="image/*"
-        capture="environment"
         className="hidden"
         ref={fileInputRef}
         onChange={handleFileChange}
@@ -273,7 +274,13 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
                   {isReading && <span className="animate-pulse">◯</span>}
                 </div>
                 <div className="font-serif text-[15px] text-foreground leading-relaxed space-y-4">
-                  <Streamdown>{stripThinking(resultText)}</Streamdown>
+                  {isReading && !resultText ? (
+                    <p className="text-muted italic animate-pulse">
+                      The Oracle gazes upon your offering… visions are forming in the ether…
+                    </p>
+                  ) : (
+                    <Streamdown>{stripThinking(resultText)}</Streamdown>
+                  )}
                 </div>
               </div>
             ) : null}
