@@ -71,11 +71,11 @@ export async function POST(req: Request) {
 
   const minimax = createOpenAI({
     apiKey: process.env.MINIMAX_API_KEY,
-    baseURL: 'https://api.minimax.chat/v1',
+    baseURL: 'https://api.minimax.io/v1',
   })
 
   const result = streamText({
-    model: minimax('minimax-2.7'),
+    model: minimax('MiniMax-M2.7'),
     system: buildSystemPrompt(safeProfile),
     messages: modelMessages,
   })

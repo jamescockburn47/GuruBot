@@ -87,11 +87,11 @@ Do not describe your actions or use asterisks. Speak directly, atmospherically, 
 
     const minimax = createOpenAI({
       apiKey: process.env.MINIMAX_API_KEY,
-      baseURL: 'https://api.minimax.chat/v1',
+      baseURL: 'https://api.minimax.io/v1',
     })
 
     const result = await streamText({
-      model: minimax('minimax-2.7'),
+      model: minimax('MiniMax-M2.7'),
       system: systemPrompt,
       messages: [
         {
