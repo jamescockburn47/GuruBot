@@ -24,19 +24,27 @@ const VISION_TYPES: { id: VisionReadingType; title: string; icon: string; descri
   { id: 'general', title: 'Let the Oracle See', icon: '👁️', description: 'Any visual impression' },
 ]
 
+const WAITING_MESSAGES = [
+  'The Oracle gazes upon your offering… visions are forming in the ether…',
+  'The veil parts slowly… shapes emerge from the mist…',
+  'Ancient energies converge upon the image… patience, seeker…',
+  'The Oracle\u2019s eye turns inward\u2026 reading the hidden patterns\u2026',
+]
+
 export function VisionGallery({ userId }: VisionGalleryProps) {
   const router = useRouter()
   const [profile, setProfile] = useState<OracleProfile | null>(null)
   const [isReady, setIsReady] = useState(false)
-  
+
   const [selectedType, setSelectedType] = useState<VisionReadingType | null>(null)
   const [compressedBase64, setCompressedBase64] = useState<string | null>(null)
-  
+
   const [isReading, setIsReading] = useState(false)
   const [resultText, setResultText] = useState('')
   const [errorStatus, setErrorStatus] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const selectedTypeRef = useRef<VisionReadingType | null>(null)
   const resultEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -57,18 +65,21 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
     }
   }, [resultText, isReading])
 
-  async function handleTypeSelect(type: VisionReadingType) {
-    setSelectedType(type)
-    
-    // For tarot, we use the in-app spread instead of uploading an image.
+  // Called synchronously from the button click handler — no setTimeout.
+  // This preserves the user-gesture trust chain so mobile Safari opens the file picker.
+  function handleTypeSelect(type: VisionReadingType) {
     if (type === 'tarot') {
+      setSelectedType(type)
       return
     }
 
-    // Small delay to allow state to settle, then open camera
-    setTimeout(() => {
-      fileInputRef.current?.click()
-    }, 50)
+    // Store the type in ref so handleFileChange can read it synchronously
+    // (state won't have updated yet when the file picker closes)
+    selectedTypeRef.current = type
+    setSelectedType(type)
+
+    // Open file picker synchronously inside the click handler
+    fileInputRef.current?.click()
   }
 
   function resizeImage(file: File): Promise<string> {
@@ -78,7 +89,6 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
         const img = new Image()
         img.onload = () => {
           const canvas = document.createElement('canvas')
-          // Max dimension 1024 to save payload size & tokens
           const MAX_SIZE = 1024
           let width = img.width
           let height = img.height
@@ -112,7 +122,9 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file || !profile || !selectedType) return
+    // Use the ref for type — state may not have updated yet
+    const type = selectedTypeRef.current
+    if (!file || !profile || !type) return
 
     setIsReading(true)
     setResultText('')
@@ -122,15 +134,12 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
       const base64Url = await resizeImage(file)
       setCompressedBase64(base64Url)
 
-      // Submit to backend
       const res = await fetch('/api/vision', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           image: base64Url,
-          readingType: selectedType,
+          readingType: type,
           profile: profile
         }),
       })
@@ -138,11 +147,11 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
       if (!res.ok) {
         const errBody = await res.text()
         console.error('Vision API response:', res.status, errBody)
-        throw new Error(`The Oracle could not see clearly. (${res.status})`)
+        throw new Error(`The Oracle's sight was obscured. (${res.status})`)
       }
 
       const reader = res.body?.getReader()
-      if (!reader) throw new Error('No stream')
+      if (!reader) throw new Error('No stream available')
 
       const decoder = new TextDecoder()
       let completeText = ''
@@ -155,18 +164,22 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
         setResultText(completeText)
       }
 
-      // Automatically save to local DB
+      if (!completeText.trim()) {
+        throw new Error('The Oracle returned silence — the vision yielded nothing.')
+      }
+
       await saveVisionReading(userId, {
         id: uuidv4(),
-        type: selectedType,
+        type: type,
         imageBase64: base64Url,
         resultText: completeText,
         createdAt: new Date().toISOString()
       })
 
     } catch (err) {
-      console.error(err)
-      setErrorStatus("A cloud obscured the vision. Try again.")
+      const msg = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Vision reading failed:', msg)
+      setErrorStatus(msg)
     } finally {
       setIsReading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -178,7 +191,10 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
     setCompressedBase64(null)
     setResultText('')
     setErrorStatus(null)
+    selectedTypeRef.current = null
   }
+
+  const waitingMessage = WAITING_MESSAGES[Math.floor(Math.random() * WAITING_MESSAGES.length)]
 
   if (!isReady) {
     return (
@@ -187,6 +203,11 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
       </div>
     )
   }
+
+  // Determine which view to show
+  const showTypeGrid = !selectedType || (selectedType !== 'tarot' && !compressedBase64 && !isReading)
+  const showTarot = selectedType === 'tarot' && profile
+  const showReading = !showTypeGrid && !showTarot
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -207,6 +228,7 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
         </div>
       </div>
 
+      {/* Hidden file input — no capture attribute so mobile gives camera + library choice */}
       <input
         type="file"
         accept="image/*"
@@ -216,9 +238,10 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
       />
 
       <div className="flex-1 overflow-y-auto">
-        {selectedType === 'tarot' && profile ? (
-          <InAppTarot userId={userId} profile={profile} onClose={handleReset} />
-        ) : (!compressedBase64 && !isReading) ? (
+        {showTarot ? (
+          <InAppTarot userId={userId} profile={profile!} onClose={handleReset} />
+
+        ) : showTypeGrid ? (
           <div className="p-6 max-w-2xl mx-auto py-12">
             <h1 className="font-serif text-3xl text-foreground text-center mb-4">
               Offer a Vision
@@ -248,7 +271,8 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
               ))}
             </div>
           </div>
-        ) : (
+
+        ) : showReading ? (
           <div className="p-4 md:p-8 max-w-3xl mx-auto space-y-8">
             {/* The Image */}
             {compressedBase64 && (
@@ -262,30 +286,40 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
               </div>
             )}
 
-            {/* The Reading */}
+            {/* Waiting / Reading / Error */}
             {errorStatus ? (
-              <div className="text-center text-red-400 font-sans text-sm py-8">
-                {errorStatus}
+              <div className="text-center py-8 space-y-3">
+                <p className="text-red-400 font-sans text-sm">{errorStatus}</p>
+                <button
+                  onClick={handleReset}
+                  className="font-sans text-xs tracking-[0.2em] uppercase text-muted hover:text-gold transition-colors border border-border hover:border-gold px-6 py-2"
+                >
+                  Try Again
+                </button>
               </div>
-            ) : (resultText || isReading) ? (
+            ) : isReading && !resultText ? (
+              <div className="border-l-2 border-oracle-border pl-4 bg-oracle-bg px-5 py-6">
+                <div className="text-[10px] tracking-[0.2em] uppercase text-gold font-sans mb-4 flex items-center gap-3">
+                  Oracle
+                  <span className="animate-pulse">◯</span>
+                </div>
+                <p className="font-serif text-[15px] text-muted italic animate-pulse leading-relaxed">
+                  {waitingMessage}
+                </p>
+              </div>
+            ) : resultText ? (
               <div className="border-l-2 border-oracle-border pl-4 bg-oracle-bg px-5 py-6">
                 <div className="text-[10px] tracking-[0.2em] uppercase text-gold font-sans mb-4 flex items-center gap-3">
                   Oracle
                   {isReading && <span className="animate-pulse">◯</span>}
                 </div>
                 <div className="font-serif text-[15px] text-foreground leading-relaxed space-y-4">
-                  {isReading && !resultText ? (
-                    <p className="text-muted italic animate-pulse">
-                      The Oracle gazes upon your offering… visions are forming in the ether…
-                    </p>
-                  ) : (
-                    <Streamdown>{stripThinking(resultText)}</Streamdown>
-                  )}
+                  <Streamdown>{stripThinking(resultText)}</Streamdown>
                 </div>
               </div>
             ) : null}
 
-            {!isReading && resultText && (
+            {!isReading && (resultText || errorStatus) && !errorStatus && (
               <div className="flex justify-center pt-8 pb-12">
                 <button
                   onClick={handleReset}
@@ -295,12 +329,12 @@ export function VisionGallery({ userId }: VisionGalleryProps) {
                 </button>
               </div>
             )}
-            
+
             <div ref={resultEndRef} className="h-4" />
           </div>
-        )}
+        ) : null}
       </div>
-      
+
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes scan {
           0%, 100% { transform: translateY(0); opacity: 0.5; }
