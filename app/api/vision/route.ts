@@ -93,7 +93,7 @@ CRITICAL RULES:
     })
 
     const result = await streamText({
-      model: anthropic('claude-3-5-sonnet-20240620'),
+      model: anthropic('claude-sonnet-4-6'),
       system: systemPrompt,
       messages: [
         {

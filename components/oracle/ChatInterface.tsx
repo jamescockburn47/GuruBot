@@ -43,7 +43,8 @@ export function ChatInterface({ userId }: Props) {
         const allSessions = await getSessions(userId)
         setSessions(allSessions)
 
-        const session = allSessions[0] ?? await createSession(userId)
+        // Always create a fresh session when logging back on
+        const session = await createSession(userId)
         setCurrentSession(session)
         setReady(true)
       } catch (err) {
@@ -178,30 +179,37 @@ export function ChatInterface({ userId }: Props) {
         <span className="font-sans text-xs tracking-[0.2em] uppercase text-muted">
           The Oracle
         </span>
-        <span className="text-gold opacity-40 text-lg select-none">◯</span>
+        <span className="text-gold opacity-40 text-lg select-none hidden sm:inline">◯</span>
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <button
-            onClick={() => router.push('/oracle/readings')}
-            className="text-gold border border-gold/30 px-3 py-1 bg-gold/5 transition-colors text-[10px] font-sans tracking-widest uppercase"
-          >
-            Visions
-          </button>
-          <button
-            onClick={() => setPanelOpen(true)}
-            className="text-muted hover:text-gold transition-colors text-xs font-sans tracking-widest uppercase"
-          >
-            Readings
-          </button>
-          <button
-            onClick={handleNewReading}
-            className="text-muted hover:text-gold transition-colors text-xs font-sans tracking-widest uppercase"
-          >
-            + New
-          </button>
+          <div className="flex bg-surface border border-border rounded-none p-1 shrink-0">
+            <button
+              onClick={handleNewReading}
+              className="text-foreground hover:bg-gold/10 hover:text-gold px-3 py-1 transition-colors text-xs font-sans tracking-widest uppercase"
+              aria-label="Start new chat"
+            >
+              + New Chat
+            </button>
+            <div className="w-px bg-border my-1 mx-1" />
+            <button
+              onClick={() => setPanelOpen(true)}
+              className="text-muted hover:bg-gold/10 hover:text-gold px-3 py-1 transition-colors text-xs font-sans tracking-widest uppercase"
+              aria-label="View history"
+            >
+              History
+            </button>
+            <div className="w-px bg-border my-1 mx-1" />
+            <button
+              onClick={() => router.push('/oracle/readings')}
+              className="text-muted hover:bg-gold/10 hover:text-gold px-3 py-1 transition-colors text-xs font-sans tracking-widest uppercase"
+              aria-label="Vision portal"
+            >
+              Visions
+            </button>
+          </div>
           <button
             onClick={() => signOut({ redirectUrl: '/sign-in' })}
-            className="text-muted hover:text-gold transition-colors text-xs font-sans tracking-widest uppercase"
+            className="text-muted hover:text-red-400 transition-colors text-[10px] font-sans tracking-widest uppercase ml-2 hidden sm:block"
           >
             Sign out
           </button>
